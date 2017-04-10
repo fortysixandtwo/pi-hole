@@ -4,6 +4,7 @@
 
 port=8080
 document_root=/var/www/html-hole
+x_frame_options=SAMEORIGIN
 
 ## Editing below this line at your own risk
 
@@ -19,8 +20,11 @@ echo " : : : Moving web interface to new document root "
 mkdir -p "${document_root}/admin"
 mv /var/www/html/admin/ "${document_root}/admin"
 
-echo " : : : Pointing chronometer to new web interface address "
+echo " : : : Setting X-Frame-Options "
+sed 's:"X-Frame-Options" => "DENY":"X-Frame-Options" => "'$x_frame_options'":g' /etc/lighttpd/lighttpd.conf \
+	| sudo tee /etc/lighttpd/lighttpd.conf
 
+echo " : : : Pointing chronometer to new web interface address "
 sed 's:127.0.0.1/admin/:127.0.0.1\:'$port'/admin/:g' /opt/pihole/chronometer.sh \
 	| sudo tee /opt/pihole/chronometer.sh
 
